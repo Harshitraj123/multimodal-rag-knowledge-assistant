@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: rag-api
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GROQ_MODEL=${GROQ_MODEL:-llama-3.3-70b-versatile}
+      - VISION_PROVIDER=${VISION_PROVIDER:-ollama}
+      - VISION_MODEL=${VISION_MODEL:-llava}
+      - VISION_API_KEY=${VISION_API_KEY}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-sentence-transformers/all-MiniLM-L6-v2}
+      - CHROMA_PERSIST_DIRECTORY=/app/data/chroma_db
+      - UPLOAD_DIRECTORY=/app/data/uploads
+      - MAX_UPLOAD_MB=${MAX_UPLOAD_MB:-50}
+      - TOP_K=${TOP_K:-5}
+      - RERANKER_ENABLED=${RERANKER_ENABLED:-false}
+      - MMR_ENABLED=${MMR_ENABLED:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - rag_chroma_data:/app/data/chroma_db
+      - rag_uploads:/app/data/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  frontend:
+    build: .
+    container_name: rag-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - VISION_PROVIDER=${VISION_PROVIDER:-ollama}
+      - VISION_MODEL=${VISION_MODEL:-llava}
+      - VISION_API_KEY=${VISION_API_KEY}
+      - CHROMA_PERSIST_DIRECTORY=/app/data/chroma_db
+      - UPLOAD_DIRECTORY=/app/data/uploads
+    volumes:
+      - rag_chroma_data:/app/data/chroma_db
+      - rag_uploads:/app/data/uploads
+    depends_on:
+      api:
+        condition: service_healthy
+    command: ["streamlit", "run", "frontend/streamlit_app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    restart: unless-stopped
+
+volumes:
+  rag_chroma_data:
+  rag_uploads:

@@ -1,0 +1,157 @@
+[
+  {
+    "case_id": "eval_001",
+    "question": "What embedding model is used in the synthetic system?",
+    "expected_sources": [
+      "synthetic_tech_report.txt",
+      "synthetic_overview.md"
+    ],
+    "expected_pages": [
+      1
+    ],
+    "required_evidence": "all-MiniLM-L6-v2",
+    "answer_type": "text",
+    "difficulty": "easy",
+    "reference_answer": "The system uses sentence-transformers/all-MiniLM-L6-v2 with 384-dimensional embeddings.",
+    "notes": "Direct lookup from technical specs"
+  },
+  {
+    "case_id": "eval_002",
+    "question": "What is the RRF k constant and why is it used?",
+    "expected_sources": [
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      3
+    ],
+    "required_evidence": "60",
+    "answer_type": "text",
+    "difficulty": "medium",
+    "reference_answer": "The RRF k constant is 60, from the original RRF paper. It prevents very high-ranked items from dominating the score.",
+    "notes": "Requires understanding of RRF"
+  },
+  {
+    "case_id": "eval_003",
+    "question": "Which retrieval configuration had the highest MRR in the benchmark table?",
+    "expected_sources": [
+      "synthetic_tech_report.txt",
+      "synthetic_performance_data.csv"
+    ],
+    "expected_pages": [
+      3
+    ],
+    "required_evidence": "Hybrid + Reranking, 0.840",
+    "answer_type": "table",
+    "difficulty": "easy",
+    "reference_answer": "Hybrid + Reranking had the highest MRR at 0.840.",
+    "notes": "Tests table retrieval"
+  },
+  {
+    "case_id": "eval_004",
+    "question": "What are the five limitations described in the system report?",
+    "expected_sources": [
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      5
+    ],
+    "required_evidence": "VISION API DEPENDENCY, BM25 REBUILD, CONTEXT WINDOW, EVALUATION LIMITATIONS, PROMPT INJECTION",
+    "answer_type": "text",
+    "difficulty": "medium",
+    "reference_answer": "The five limitations are: vision API dependency, BM25 rebuild on delete, context window limits, evaluation limitations, and prompt injection risk.",
+    "notes": "Multi-item retrieval"
+  },
+  {
+    "case_id": "eval_005",
+    "question": "What is the average latency of dense-only retrieval?",
+    "expected_sources": [
+      "synthetic_performance_data.csv",
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      1
+    ],
+    "required_evidence": "45",
+    "answer_type": "table",
+    "difficulty": "easy",
+    "reference_answer": "Dense-only retrieval has an average latency of 45ms.",
+    "notes": "Exact numeric lookup from CSV"
+  },
+  {
+    "case_id": "eval_006",
+    "question": "Why does the system use hybrid retrieval instead of dense-only?",
+    "expected_sources": [
+      "synthetic_overview.md"
+    ],
+    "expected_pages": [
+      1
+    ],
+    "required_evidence": "exact matches, semantic equivalents, Reciprocal Rank Fusion",
+    "answer_type": "text",
+    "difficulty": "medium",
+    "reference_answer": "Hybrid retrieval combines dense (semantic similarity) and sparse (exact matching) approaches. Dense handles semantic equivalents; BM25 handles exact terms. Both strengths are combined via RRF.",
+    "notes": "Requires synthesis from design decisions section"
+  },
+  {
+    "case_id": "eval_007",
+    "question": "What is the embedding dimension of the all-MiniLM-L6-v2 model?",
+    "expected_sources": [
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      2
+    ],
+    "required_evidence": "384",
+    "answer_type": "text",
+    "difficulty": "easy",
+    "reference_answer": "The embedding dimension is 384.",
+    "notes": "Direct lookup"
+  },
+  {
+    "case_id": "eval_008",
+    "question": "What document types does the system support?",
+    "expected_sources": [
+      "synthetic_tech_report.txt",
+      "synthetic_overview.md"
+    ],
+    "expected_pages": [
+      1
+    ],
+    "required_evidence": "PDF, DOCX, CSV, Markdown, PPTX, PNG, JPG",
+    "answer_type": "text",
+    "difficulty": "easy",
+    "reference_answer": "The system supports PDF, DOCX, CSV, Markdown (.md), plain text (.txt), PPTX, PNG, JPG, and JPEG.",
+    "notes": "List enumeration"
+  },
+  {
+    "case_id": "eval_009",
+    "question": "What are the three types of visual content handled by the system?",
+    "expected_sources": [
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      4
+    ],
+    "required_evidence": "PAGE RENDERS, EMBEDDED IMAGES, STANDALONE IMAGES",
+    "answer_type": "text",
+    "difficulty": "medium",
+    "reference_answer": "The three types are: page renders (PDF pages at 150 DPI), embedded images (from DOCX/PPTX), and standalone image files (PNG/JPG).",
+    "notes": "Requires reading page 4"
+  },
+  {
+    "case_id": "eval_010",
+    "question": "What is the HyDE retrieval latency compared to dense-only?",
+    "expected_sources": [
+      "synthetic_performance_data.csv",
+      "synthetic_tech_report.txt"
+    ],
+    "expected_pages": [
+      3
+    ],
+    "required_evidence": "450, 45",
+    "answer_type": "table",
+    "difficulty": "hard",
+    "reference_answer": "HyDE has a latency of 450ms versus 45ms for dense-only \u2014 approximately 10x slower due to the hypothesis generation step.",
+    "notes": "Requires comparison between two table rows"
+  }
+]

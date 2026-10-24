@@ -1,0 +1,132 @@
+[SYNTHETIC DATA - NOT REAL]
+SYNTHETIC TECHNICAL REPORT: Document Intelligence System v2.0
+==============================================================
+
+PAGE 1: EXECUTIVE SUMMARY
+--------------------------
+
+This synthetic report describes a fictional document intelligence platform
+designed to demonstrate Retrieval-Augmented Generation (RAG) capabilities.
+
+The system supports the following document types:
+- PDF documents (text, tables, rendered page images)
+- Word documents (DOCX) with tables and embedded images
+- CSV data files with structured tabular data
+- Markdown and plain text files
+- PowerPoint presentations (PPTX)
+- Standalone image files (PNG, JPG, JPEG)
+
+Key capabilities demonstrated:
+1. Hybrid dense/sparse retrieval
+2. Visual content understanding
+3. Table extraction and retrieval
+4. Source citation with validation
+5. Multi-turn conversation support
+
+PAGE 2: TECHNICAL SPECIFICATIONS
+----------------------------------
+
+EMBEDDING MODEL SPECIFICATIONS:
+- Model: sentence-transformers/all-MiniLM-L6-v2
+- Embedding Dimension: 384
+- Max Sequence Length: 256 tokens
+- Similarity Metric: Cosine similarity
+- Normalization: L2-normalized vectors
+
+CHUNKING PARAMETERS:
+- Default chunk size: 512 characters
+- Overlap: 64 characters
+- Strategy: Paragraph-first, then sentence-boundary splitting
+- Table chunking: 20 rows per chunk with header repetition
+
+BM25 PARAMETERS:
+- Implementation: BM25Okapi
+- Tokenization: Whitespace + punctuation, lowercased
+- k1: 1.5 (BM25Okapi default)
+- b: 0.75 (BM25Okapi default)
+
+RRF PARAMETERS:
+- k constant: 60 (standard from original RRF paper)
+- Input lists: dense + sparse ranked results
+- Output: score = sum(1 / (60 + rank))
+
+PAGE 3: RETRIEVAL BENCHMARKS
+------------------------------
+
+SYNTHETIC EVALUATION DATASET:
+- 20 evaluation questions
+- 5 difficulty levels: easy (6), medium (8), hard (6)
+- Question types: text (10), table (5), image (3), cross-modal (2)
+
+RETRIEVAL CONFIGURATION COMPARISON:
+
+Configuration         | MRR   | Hit@5 | Recall@5 | Latency
+----------------------|-------|-------|----------|--------
+Dense Only            | 0.720 | 0.850 | 0.710    | 45ms
+Sparse (BM25)         | 0.650 | 0.780 | 0.630    | 12ms
+Hybrid RRF            | 0.810 | 0.920 | 0.830    | 58ms
+Hybrid + MMR          | 0.790 | 0.900 | 0.850    | 72ms
+Hybrid + Reranking    | 0.840 | 0.930 | 0.850    | 285ms
+Query Rewriting       | 0.820 | 0.925 | 0.840    | 320ms
+HyDE                  | 0.825 | 0.928 | 0.845    | 450ms
+
+NOTE: All values above are SYNTHETIC and for demonstration only.
+Real benchmarks require actual API credentials and a real document corpus.
+
+PAGE 4: VISUAL CONTENT HANDLING
+---------------------------------
+
+The system supports three types of visual content:
+
+TYPE 1: PAGE RENDERS
+PDF pages are rendered at 150 DPI using pdfplumber.
+Each rendered page is indexed with a vision-model description.
+Page renders capture content that text extraction misses:
+- Mathematical formulas
+- Complex layouts
+- Handwritten annotations
+- Diagrams embedded in text flow
+
+TYPE 2: EMBEDDED IMAGES
+DOCX and PPTX files may contain embedded images.
+These are extracted and indexed separately with their page/slide context.
+
+TYPE 3: STANDALONE IMAGES
+PNG, JPG, and JPEG files are treated as visual documents.
+The entire file becomes one visual asset with auto-generated description.
+
+VISUAL RETRIEVAL PROCESS:
+1. Query is embedded and compared to visual description embeddings
+2. Top-k visual assets are retrieved
+3. Original image bytes are decoded from ChromaDB metadata
+4. Vision model receives original image + user question
+5. Response is grounded in actual visual evidence
+
+PAGE 5: LIMITATIONS AND KNOWN ISSUES
+--------------------------------------
+
+1. VISION API DEPENDENCY
+   Visual reasoning requires an external vision-capable model API.
+   Without credentials, visual content descriptions are stored but
+   questions cannot be answered with visual evidence.
+
+2. BM25 REBUILD ON DELETE
+   Deleting a document marks it as deleted in the registry and removes
+   its vector store chunks. The BM25 index is rebuilt on next ingest.
+   For very large corpora, this may be slow.
+
+3. CONTEXT WINDOW LIMITS
+   Very long documents may produce many chunks.
+   Only top-k chunks are sent to the LLM per query.
+   Information in lower-ranked chunks may be missed.
+
+4. EVALUATION LIMITATIONS
+   The provided evaluation dataset is synthetic and small (20 cases).
+   Real-world performance depends heavily on document quality and corpus size.
+
+5. PROMPT INJECTION RISK
+   Document content is treated as untrusted data.
+   A fixed system prompt instructs the model to answer only from evidence.
+   However, sophisticated prompt injection in documents cannot be fully prevented.
+
+END OF SYNTHETIC REPORT
